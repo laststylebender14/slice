@@ -24,7 +24,8 @@ class StringCommandHandler:
         
     def log(self,operation: SupportedCommands, aofEntry: AOFEntry) -> None:
         print("[Logging]:", operation.value, aofEntry)
-        self.walFile.log(operation,aofEntry)
+        if self.walFile:
+            self.walFile.log(operation,aofEntry)
         
     def setnx(self, commands: List[str]) -> str:
         commandSize = len(commands)
