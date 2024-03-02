@@ -20,6 +20,9 @@ class Store(ABC):
     @abstractmethod
     def delete(self, key:str) -> bool:
         pass
+    @abstractmethod
+    def exists(self,key:str) -> bool:
+        pass
 
 KEY_VALUE_NOT_EXISTS = -1
 KEY_VALUE_NOT_INSERTED = 0
@@ -37,7 +40,13 @@ class KVStore(Store):
         self.store: dict[str, Node] = {}
         
     def exists(self, key: str) -> bool:
-        return key in self.store
+        if key not in self.store:
+            return False
+        if self.store[key].is_node_expired():
+            # if expired then delete it.
+            if self.delete(key):
+                return False
+        return True
         
     def normalize_ttl(self, value:Node|None ,options: Options) -> Node:
         """ 
@@ -79,14 +88,10 @@ class KVStore(Store):
             self.store[key] = self.normalize_ttl(value, options)
             return KEY_VALUE_INSERTED
 
-    def get(self, key) -> Node:
-        if key in self.store:
-            if self.store[key].is_node_expired():
-                self.delete(key)    # lazy deletion
-                return None
-            else:
-                return self.store[key]
-        return None
+    def get(self, key) -> Node | int:
+        if self.exists(key):
+            return self.store[key]
+        return KEY_VALUE_NOT_EXISTS
         
             
     def delete(self, key) -> bool:
