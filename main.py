@@ -15,7 +15,7 @@ from core.aof.aof import AOF
 from core.commandhandler.command_handler import CommandHandler
 
 
-if __name__ == "main":
+if __name__ == "__main__":
     walFile = AOF("./aof.slice",)
     store = KVStore()
     print("[Logger]:","Checking for AOF file")
