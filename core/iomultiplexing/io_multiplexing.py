@@ -9,7 +9,7 @@ class IO_Multiplexer:
         self.server_socket = server_socket
         self.concurrent_connection_count = 0
         self.selector.register(server_socket,selectors.EVENT_READ,self.accept)
-        print(f"i/o multiplexer register with server socket")
+        print(f"i/o multiplexer registered with server socket")
     
     def accept(self, client_socket: socket.socket, mask):
         conn, addr = client_socket.accept()
