@@ -1,4 +1,3 @@
-import time
 from zlib import crc32
 from abc import abstractmethod
 
@@ -37,8 +36,7 @@ class AOF:
             entry: AOFEntry that needs to be logged in file.
         """
         if self.log_file:
-            timestamp = int(time.time() * 1000)
-            data_string = f"{timestamp},{operation.value},{entry.key}"
+            data_string = f"{operation.value},{entry.key}"
             if entry.value is not None:
                 data_string += f"{self.separator}{entry.value}"
             if entry.ttl is not None:
@@ -63,7 +61,7 @@ class AOF:
         self.flush_to_disk()
         self.log_file.close()
 
-    def replay(self) -> None:
+    def replay(self, command_handler) -> None:
         """
         Replays the logged operations from the AOF file into the provided data store,
         verifying CRC for data integrity.
@@ -87,23 +85,31 @@ class AOF:
                     break
 
                 # Extract operation and data from the data string
-                _, operation_str, key, *data = data_string.split(self.separator)
-                operation = SupportedCommands(operation_str)
+                operation_str, key, *data = data_string.split(self.separator)
+                processed_operation_str = operation_str.strip().lower()
+                operation = SupportedCommands(processed_operation_str)
                 entry = {"key": key}
-                if len(data) >= 1:
-                    # Handle potential empty string values for value
-                    value = data[0]
-                    entry["value"] = value if value else None
-                if len(data) >= 2:
-                    # Handle potential empty string values for ttl
-                    ttl = data[1]
-                    entry["ttl"] = int(ttl) if ttl else None
-                if len(data) >= 3:
-                    entry["option"] = data[2] if data[2] else None
-                if operation == SupportedCommands.SET:
-                    print(entry)
-                    # data_store.set(key, entry.get("value"), entry.get("ttl"))
-                # Add logic for other operations
+                if processed_operation_str in ["set","setnx","setxx","getdel","del"] :
+                    for i in data:
+                        if i in ["nx","px","ex","xx"]:
+                            # check if it' options or what?
+                            entry["options"] = Options(i)   # TODO: handle for multiple options in future.
+                        elif isinstance(i, int):
+                            entry["ttl"] = int(i)
+                        else:
+                            entry["value"] = i
+                
+                if operation.value.strip().lower() in [SupportedCommands.SET.value, SupportedCommands.SETNX.value,SupportedCommands.SETXX.value,SupportedCommands.GETDEL.value]:
+                    commands = [operation.value.strip().lower(),entry["key"],]
+                    if "value" in entry:
+                        commands.append(entry["value"])
+                    if "options" in entry:
+                        if entry["options"].value == Options.EX or entry["options"].value == Options.PX:
+                            commands.append(entry["options"])
+                            commands.append(entry["ttl"])
+                        else:
+                            commands.append(entry["options"].value)
+                    command_handler.handle(commands)
             
     def clear(self) -> None:
         """Clears the contents of the AOF file."""
