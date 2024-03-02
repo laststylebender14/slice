@@ -37,5 +37,5 @@ class Server(IServer):
             resp_decoded_req = decode_redis_command(data=data)
             resp = self.command_handler.handle(resp_decoded_req)
             client_socket.send(resp)
-        except:
-            client_socket.send(encode_bulk_strings_reps("Error parsing request"))
+        except ValueError as err:
+            client_socket.send(encode_bulk_strings_reps(str(err)))
