@@ -45,7 +45,7 @@ class KVStore(Store):
         """
         if value.ttl:
             if options == Options.EX:
-                value.ttl = int(time.time() * 1000) + int(value.ttl,10)
+                value.ttl = int(time.time() * 1000) + int(value.ttl,10) #TODO: handle the possibility of user passing non int values.
             else:
                 value.ttl = int(time.time() * 1000) + (int(value.ttl,10) * 1000)
         return value
@@ -82,7 +82,7 @@ class KVStore(Store):
     def get(self, key) -> Node:
         if key in self.store:
             if self.store[key].is_node_expired():
-                self.delete(key)
+                self.delete(key)    # lazy deletion
                 return None
             else:
                 return self.store[key]
