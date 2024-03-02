@@ -33,9 +33,9 @@ class StringCommandHandler:
         
         key, value = commands
         
-        resp = self.interactor.setnx(key=key,value=Node(value=value,type=StructureType.STRING),options=Options.build(nx=True))    # {0 - exits,-1 -> not,1 -> inserted} 
+        resp = self.interactor.setnx(key=key,value=Node(value=value,type=StructureType.STRING),options=Options("nx"))    # {0 - exits,-1 -> not,1 -> inserted} 
         if resp == 1:
-            self.log(SupportedCommands.SET,AOFEntry(key=key,value=value,options=Options.build(nx=True)))
+            self.log(SupportedCommands.SET,AOFEntry(key=key,value=value,options=Options("nx")))
             return encode_simple_strings_resp("OK")
         return encode_null_string_resp()
 
@@ -47,9 +47,9 @@ class StringCommandHandler:
         
         key, value = commands
             
-        resp = self.interactor.setxx(key=key,value=Node(value=value,type=StructureType.STRING),options=Options.build(xx=True))    # {0 - exits,-1 -> not,1 -> inserted} 
+        resp = self.interactor.setxx(key=key,value=Node(value=value,type=StructureType.STRING),options=Options("xx"))    # {0 - exits,-1 -> not,1 -> inserted} 
         if resp == 1:
-            self.log(SupportedCommands.SET,AOFEntry(key=key,value=value,options=Options.build(xx=True)))
+            self.log(SupportedCommands.SET,AOFEntry(key=key,value=value,options=Options("xx")))
             return encode_simple_strings_resp("OK")
         return encode_null_string_resp()
     
@@ -92,9 +92,9 @@ class StringCommandHandler:
                 return encode_bulk_strings_reps("ERR Syntax error")
                 
             if processed_command == StringOptions.PX.value:
-                options = Options.build(px=True)
+                options = Options("px")
             elif processed_command == StringOptions.EX.value:
-                options = Options.build(ex=True)
+                options = Options("ex")
             
             resp = self.interactor.set(key=key,value=Node(value=value,type=StructureType.STRING, ttl=expiration), options= options)
             if resp == 1:
