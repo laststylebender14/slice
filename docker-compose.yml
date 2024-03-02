@@ -1,0 +1,15 @@
+version: '3.8'  # Specify Docker Compose version (adjust if needed)
+
+services:
+  slice-db:  # Replace with your actual application name
+    build: .  # Build the image from the current directory (Dockerfile)
+    image: slice-db:v5
+    container_name: slice-db
+    ports:
+      - "6379:6379"  # Map container port 6379 to host port 6379 (if applicable)
+    networks:
+      - slice-db-networks
+
+networks:
+  slice-db-networks:
+    
