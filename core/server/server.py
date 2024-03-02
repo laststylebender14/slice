@@ -19,7 +19,7 @@ class Server(IServer):
         self.command_handler = command_handler
         
         # instantiate the io multiplexer
-        self.io_multiplexer = IO_Multiplexer(selector= selectors.KqueueSelector(), server_socket=self.server_socket, server=self)
+        self.io_multiplexer = IO_Multiplexer(selector= selectors.DefaultSelector(), server_socket=self.server_socket, server=self)
 
     def start_server(self):
         """
