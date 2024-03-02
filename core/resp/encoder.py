@@ -16,5 +16,3 @@ def encode_redis_command(command):
     encoded_command = f"*{len(parts)}\r\n{''.join(parts)}"
     print(f" encoded command : {encoded_command.encode()}")
     return escape_encode(encoded_command.encode())[0]
-
-print(encode_redis_command("set ping pong"))
