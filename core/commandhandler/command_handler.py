@@ -27,4 +27,4 @@ class CommandHandler:
                 return self.string_command_handler.setnx(commands=commands[1:])
             elif command == SupportedCommands.SETXX.value:
                 return self.string_command_handler.setxx(commands=commands[1:])
-        return encode_null_string_resp()
+        return encode_bulk_strings_reps("Error syntax error")
