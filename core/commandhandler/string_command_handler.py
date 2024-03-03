@@ -7,6 +7,7 @@ from core.resp.encoder import (
     encode_simple_strings_resp,
     encode_bulk_strings_reps,
     encode_null_string_resp,
+    encode_integer,
 )
 from core.storage.node import Node
 from core.types.structure_types import StructureType
@@ -60,9 +61,9 @@ class StringCommandHandler:
                 options=Options("nx"),
             )
             self.log(log_line)
-            return encode_simple_strings_resp("(integer) 1")
+            return encode_integer(1)
         except OperationFailed as err:
-            return encode_simple_strings_resp("(integer) 0")
+            return encode_integer(0)
         except InvalidValueType as err:
             return encode_bulk_strings_reps(str(err))
         except Exception as err:
@@ -88,9 +89,9 @@ class StringCommandHandler:
                 options=Options("xx"),
             )
             self.log(log_line)
-            return encode_simple_strings_resp("(integer) 1")
+            return encode_integer(1)
         except OperationFailed as err:
-            return encode_simple_strings_resp("(integer) 0")
+            return encode_integer(0)
         except InvalidValueType as err:
             return encode_bulk_strings_reps(str(err))
         except Exception as err:
@@ -198,7 +199,7 @@ class StringCommandHandler:
             resp: Node = self.interactor.get(key=key)
             return encode_bulk_strings_reps(resp=resp.value)
         except KeyNotExists as err:
-            return encode_bulk_strings_reps(str(err))
+            return encode_null_string_resp()
         except IncompatibleValueType as err:
             return encode_bulk_strings_reps(str(err))
         except Exception as err:
@@ -224,9 +225,9 @@ class StringCommandHandler:
                 self.log(log_line)
                 return encode_bulk_strings_reps(resp=resp.value)
         except KeyNotExists as err:
-            return encode_bulk_strings_reps(str(err))
+            return encode_null_string_resp()
         except IncompatibleValueType as err:
-            return encode_bulk_strings_reps(str(err))
+            return encode_null_string_resp()
         except OperationFailed as err:
             return encode_bulk_strings_reps(str(err))
         except Exception as err:
