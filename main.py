@@ -25,5 +25,6 @@ if __name__ == "__main__":
         print("[Logger]:","Replying the for AOF file done")
     command_handler = CommandHandler(store=store, walFile=walFile)
     print(banner)
+    banner = None # clean-up allocated memeory for banner
     Server(store=store,command_handler=command_handler).start_server()
     
