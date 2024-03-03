@@ -1,5 +1,7 @@
 import selectors
 import socket
+from time import time
+
 from core.server.iserver import IServer
 
 class IO_Multiplexer:
@@ -9,6 +11,9 @@ class IO_Multiplexer:
         self.server_socket = server_socket
         self.concurrent_connection_count = 0
         self.selector.register(server_socket,selectors.EVENT_READ,self.accept)
+        
+        
+        self.cron_frequency = 1
         print(f"i/o multiplexer registered with server socket")
     
     def accept(self, client_socket: socket.socket, mask):
@@ -29,8 +34,14 @@ class IO_Multiplexer:
             self.server.handle_connection(client_socket=client_socket,data=data)
     
     def run(self):
+        last_cron_exec_time = time()
+
         while True:
-            events = self.selector.select()
+            if time() - last_cron_exec_time >= self.cron_frequency:
+                self.server.cron_execution()
+                last_cron_exec_time = time()
+                pass                 
+            events = self.selector.select(-1)
             for key, mask in events:
                 callback = key.data
                 callback(key.fileobj, mask)

@@ -11,3 +11,7 @@ class IServer(ABC):
     @abstractmethod
     def start_server(self):
         pass
+    
+    @abstractmethod
+    def cron_execution(self):
+        pass
