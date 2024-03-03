@@ -2,7 +2,7 @@ from core.server.server import Server
 from core.storage.kv_store import KVStore
 from core.aof.aof import AOF_V2
 from core.commandhandler.command_handler import CommandHandler
-
+from config import load_config, WalConfig
 
 banner = """ 
  ____  _ _            ____  ____  
@@ -13,10 +13,11 @@ banner = """
 """
 
 if __name__ == "__main__":
+    load_config()
+    
     walFile = None
-    if False:
-        # TODO: enalbe via configuration.
-        walFile = AOF_V2("./aof.slice",)
+    if WalConfig().is_wal_enabled():
+        walFile = AOF_V2(WalConfig().get_path())
     store = KVStore()
     if walFile:
         print("[Logger]:","Checking for AOF file")
