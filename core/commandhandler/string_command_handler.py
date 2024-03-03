@@ -105,7 +105,7 @@ class StringCommandHandler:
         len(commands) ==  5 then  ["KEY","VALUE","NX/PX","EX/PX","EXP_TIME"]    TODO: provide support for 5th command.
         """
         log_line = ",".join(commands)
-        logging_command = commands
+        raw_commands = commands
         commands = commands[1:]
 
         commandSize = len(commands)
@@ -132,9 +132,9 @@ class StringCommandHandler:
             processedOption = option.strip().lower()
 
             if processedOption == StringOptions.XX.value:
-                return self.setxx(commands[:-1])
+                return self.setxx(raw_commands[:-1])
             elif processedOption == StringOptions.NX.value:
-                return self.setnx(commands[:-1])
+                return self.setnx(raw_commands[:-1])
             return encode_bulk_strings_reps("ERR Syntax error")
 
         elif commandSize == 4:
@@ -170,8 +170,8 @@ class StringCommandHandler:
                     value=Node(value=value, type=StructureType.STRING, ttl=expiration),
                     options=options,
                 )
-                logging_command[4] = str(processed_expiry_time)
-                log_line = ",".join(logging_command)
+                raw_commands[4] = str(processed_expiry_time)
+                log_line = ",".join(raw_commands)
                 self.log(log_line)
                 return encode_simple_strings_resp("OK")
             except OperationFailed as err:
