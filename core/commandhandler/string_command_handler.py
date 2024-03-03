@@ -8,7 +8,6 @@ from core.storage.node import Node
 from core.types.structure_types import StructureType
 from core.storage.options import Options
 from core.aof.aof import WAL
-from core.aof.aof_entry import AOFEntry
 from core.commandhandler.supported_commands import SupportedCommands
 
 class StringOptions(Enum):
@@ -22,35 +21,46 @@ class StringCommandHandler:
         self.interactor = StringInteractor(store=store)
         self.walFile = walFile
         
-    def log(self,operation: SupportedCommands, aofEntry: AOFEntry) -> None:
-        print("[Logging]:", operation.value, aofEntry)
+    def log(self, log_line) -> None:
         if self.walFile:
-            self.walFile.log(operation,aofEntry)
+            self.walFile.log(log_line)
         
     def setnx(self, commands: List[str]) -> str:
+        """ 
+            handles commands like:
+            [setnx key value]
+        """
+        log_line = ",".join(commands)
+        commands = commands[1:]
         commandSize = len(commands)
-        if commandSize < 2:
+        if commandSize != 2:
             return encode_bulk_strings_reps("ERR Syntax error")
         
         key, value = commands
         
         resp = self.interactor.setnx(key=key,value=Node(value=value,type=StructureType.STRING),options=Options("nx"))    # {0 - exits,-1 -> not,1 -> inserted} 
         if resp == 1:
-            self.log(SupportedCommands.SET,AOFEntry(key=key,value=value,options=Options("nx")))
+            self.log(log_line)
             return encode_simple_strings_resp("OK")
         return encode_null_string_resp()
 
     
     def setxx(self, commands: List[str]) -> str:
+        """ 
+            handles commands like:
+            [setxx key value]
+        """
+        log_line = ",".join(commands)
+        commands = commands[1:]
         commandSize = len(commands)
-        if commandSize < 2:
+        if commandSize != 2:
             return encode_bulk_strings_reps("ERR Syntax error")
         
         key, value = commands
             
         resp = self.interactor.setxx(key=key,value=Node(value=value,type=StructureType.STRING),options=Options("xx"))    # {0 - exits,-1 -> not,1 -> inserted} 
         if resp == 1:
-            self.log(SupportedCommands.SET,AOFEntry(key=key,value=value,options=Options("xx")))
+            self.log(log_line)
             return encode_simple_strings_resp("OK")
         return encode_null_string_resp()
     
@@ -62,15 +72,17 @@ class StringCommandHandler:
             len(commands) ==  4 then  ["KEY","VALUE","EX/PX","EXP_TIME"]
             len(commands) ==  5 then  ["KEY","VALUE","NX/PX","EX/PX","EXP_TIME"]
         """
+        log_line = ",".join(commands)
+        commands = commands[1:]
         commandSize = len(commands)
-        if commandSize not in [2,3,4,5] or commandSize < 2:
+        if commandSize not in [2,3,4,5]:
             return encode_bulk_strings_reps("ERR Syntax error")
         
         if commandSize == 2:     
             key, value = commands
             resp = self.interactor.set(key=key,value=Node(value=value,type=StructureType.STRING))
             if resp == 1 or resp == 0:
-                self.log(SupportedCommands.SET,AOFEntry(key=key,value=value))
+                self.log(log_line)
                 return encode_simple_strings_resp("OK")
             return encode_null_string_resp()
         
@@ -88,10 +100,8 @@ class StringCommandHandler:
             key, value, exp_command, exp_time = commands
             expiration = exp_time
             processed_command = exp_command.strip().lower()
-            
             if processed_command not in ["ex","px"]:
                 return encode_bulk_strings_reps("ERR Syntax error")
-                
             if processed_command == StringOptions.PX.value:
                 options = Options("px")
             elif processed_command == StringOptions.EX.value:
@@ -99,13 +109,23 @@ class StringCommandHandler:
             
             resp = self.interactor.set(key=key,value=Node(value=value,type=StructureType.STRING, ttl=expiration), options= options)
             if resp == 1:
-                self.log(SupportedCommands.SET,AOFEntry(key=key,value=value,ttl=expiration,options=options))
+                self.log(log_line)
                 return encode_simple_strings_resp("OK")
             return encode_null_string_resp()
             
         return encode_null_string_resp()
             
     def get(self, commands: List[str]) -> str:
+        """ 
+            handles commands like:
+            [get key]
+        """
+        commands = commands[1:]
+        commandSize = len(commands)
+        
+        if commandSize != 1:
+            return encode_bulk_strings_reps("ERR Syntax error")
+                
         key = commands[0]
         resp:(Node | None) = self.interactor.get(key=key)
         if resp is None:
@@ -113,10 +133,22 @@ class StringCommandHandler:
         return encode_bulk_strings_reps(resp=resp.value)
     
     def delete(self, commands: List[str]) -> str:
+        """ 
+            handles commands like:
+            [getdel key]
+        """
+        log_line = ",".join(commands)
+        commands = commands[1:]
+        
+        commandSize = len(commands)
+        
+        if commandSize != 1:
+            return encode_bulk_strings_reps("ERR Syntax error")
+        
         key = commands[0]
         resp: (Node | None) = self.interactor.delete(key=key)
         if resp:
-            self.log(SupportedCommands.GETDEL,AOFEntry(key=key))
+            self.log(log_line)
             return encode_bulk_strings_reps(resp=resp.value)
         return encode_null_string_resp()
         
