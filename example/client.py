@@ -1,5 +1,11 @@
 import redis
+import time
 
 r = redis.Redis(host="localhost",port=6379)
-print(r.set("redis","hello"))
-print(r.get("redis"))
+start = time.time()
+for i in range(0,20_000):
+    print(i," ",r.set("key-"+str(i),"value-"+str(i)))
+
+end = time.time()
+
+print(" total time in sec: " ,end - start)
