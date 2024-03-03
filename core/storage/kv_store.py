@@ -80,7 +80,7 @@ class KVStore(Store):
             return StorageOperationReturnType.KEY_VALUE_NOT_INSERTED
 
         normalizedValue = self.normalize_ttl(value, options)
-        get_logger().info("[Store]:", "[setnx]:", f"{key} inserted into db")
+        get_logger().info(f"[set_nx]: {key} inserted into db")
         self.store[key] = normalizedValue
         return StorageOperationReturnType.KEY_VALUE_INSERTED
 
@@ -90,7 +90,7 @@ class KVStore(Store):
         if not self.exists(key):
             return StorageOperationReturnType.KEY_VALUE_NOT_INSERTED
         normalizedValue = self.normalize_ttl(value, options)
-        get_logger().info("[Store]:", "[set_xx]:", f"{key} inserted into db")
+        get_logger().info(f"[set_xx]: {key} inserted into db")
         self.store[key] = normalizedValue
         return StorageOperationReturnType.KEY_VALUE_INSERTED
 
@@ -102,7 +102,7 @@ class KVStore(Store):
         if options == Options.XX:
             return self.set_xx(key, value, options)
         else:
-            get_logger().info("[Store]:", "[set]:", f"{key} inserted into db")
+            get_logger().info(f"[set]: {key} inserted into db")
             self.store[key] = self.normalize_ttl(value, options)
             return StorageOperationReturnType.KEY_VALUE_INSERTED
 
@@ -114,7 +114,7 @@ class KVStore(Store):
     def delete(self, key) -> bool:
         if key in self.store:
             del self.store[key]
-            get_logger().info("[Store]:", f"{key} deleted from db")
+            get_logger().info(f"[delete]: {key} deleted from db")
             return True
         return False
 
