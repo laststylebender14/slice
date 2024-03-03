@@ -16,3 +16,9 @@ def encode_redis_command(command):
     encoded_command = f"*{len(parts)}\r\n{''.join(parts)}"
     print(f" encoded command : {encoded_command.encode()}")
     return escape_encode(encoded_command.encode())[0]
+
+def encode_integer(value: int) -> str:
+    if value >= 0:
+        return b':' + str(value).encode('ascii') + b'\r\n'
+    else:
+        return b':-' + str(abs(value)).encode('ascii') + b'\r\n'
