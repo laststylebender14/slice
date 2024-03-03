@@ -20,6 +20,14 @@ Building a database from scratch can be an exhilarating experience. With Slice, 
 - learn about advanced data structures, algorithms, and event loops (io multiplexing)
 - collaborate with other engineers and contribute back to Open Source
 
+## Why Use Slice?
+
+While production use of Slice might not be ideal, it offers a perfect platform for:
+
+Educational Purposes: Learn the fundamentals of key-value stores and database systems in a practical way.
+Experimentation and Prototyping: Rapidly test and validate data storage concepts for small-scale projects.
+Building a Foundation for Redis: Get comfortable with the RESP protocol used by Redis before diving into the full-fledged server.
+
 
 ## Getting Started
 
