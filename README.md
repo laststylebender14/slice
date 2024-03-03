@@ -33,6 +33,9 @@ Building a Foundation for Redis: Get comfortable with the RESP protocol used by 
 
 To run SliceDB locally, you'll need:
 
+### Using Python
+
+You'll need:
 1. **Python 3+**
 2. A supported platform environment:
    - Linux-based environment
@@ -41,8 +44,22 @@ To run SliceDB locally, you'll need:
 ```
 $ git clone https://github.com/ranjitmahadik/slice-db
 $ cd slice-db
+$ pip3 install -r requirements.txt
 $ python3 main.py
+$ mv .example.env .env
 ```
+
+### Using Docker
+
+You'll need:
+1.  **Docker**
+```
+$ git clone https://github.com/ranjitmahadik/slice-db
+$ cd slice-db
+$ mv .example.env .env
+$ docker compose up -d
+```
+
 
 ## Slice in action
 
