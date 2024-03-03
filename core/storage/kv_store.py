@@ -1,8 +1,9 @@
+import time
 from abc import ABC, abstractmethod
 
 from core.storage.options import Options
 from core.storage.node import Node
-from core.utils.expiry_utils import normalize_ttl
+from core.utils.time_utils import convert_to_absolute_expiray_in_ms, convert_time_to_ms
 
 class Store(ABC):
     @abstractmethod
@@ -51,12 +52,24 @@ class KVStore(Store):
                 return False
         return True
         
+    def normalize_ttl(self, value:Node|None ,options: Options) -> Node:
+        """ 
+            depending on the options set, this function returns absolute expiry time.
+        """
+        if value.ttl:
+            if options == Options.EX:
+                value.ttl = convert_time_to_ms() + int(value.ttl,10) #TODO: handle the possibility of user passing non int values.
+            else:
+                value.ttl = convert_to_absolute_expiray_in_ms(int(value.ttl,10))
+        return value
+        
+        
     def set_nx(self,key: str, value: Node | None, options:Options = None) -> int:
         """ set if key doesn't exists"""
         if self.exists(key):
             return KEY_VALUE_NOT_EXISTS
         
-        normalizedValue = normalize_ttl(value, options)        
+        normalizedValue = self.normalize_ttl(value, options)        
         print("[Store]:","[setnx]:",f"{key} inserted into db")
         self.store[key] = normalizedValue
         return KEY_VALUE_INSERTED
@@ -64,7 +77,7 @@ class KVStore(Store):
     def set_xx(self, key: str, value: Node | None, options:Options = None) -> int:
         if not self.exists(key):
             return KEY_VALUE_NOT_EXISTS
-        normalizedValue = normalize_ttl(value, options)        
+        normalizedValue = self.normalize_ttl(value, options)        
         print("[Store]:","[set_xx]:",f"{key} inserted into db")
         self.store[key] = normalizedValue
         return KEY_VALUE_INSERTED
@@ -76,7 +89,7 @@ class KVStore(Store):
             return self.set_xx(key,value,options)
         else:
             print("[Store]:","[set]:",f"{key} inserted into db")
-            self.store[key] = normalize_ttl(value, options)
+            self.store[key] = self.normalize_ttl(value, options)
             return KEY_VALUE_INSERTED
 
     def get(self, key) -> Node | int:
