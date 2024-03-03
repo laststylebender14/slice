@@ -27,6 +27,6 @@ if __name__ == "__main__":
         walFile.replay(CommandHandler(store=store, walFile=None))
         get_logger().info("Replying the for AOF file done")
     command_handler = CommandHandler(store=store, walFile=walFile)
-    get_logger().debug(banner)
+    print(banner)
     banner = None  # clean-up allocated memeory for banner
     Server(store=store, command_handler=command_handler).start_server()
