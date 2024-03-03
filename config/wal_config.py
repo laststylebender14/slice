@@ -6,7 +6,7 @@ class WalConfig:
         return cls._instance
     
     def set_wal_enable(self, status : bool = False) -> None:
-        self.enable = status
+        self.enable = status == "True"
 
     def set_path(self, path : str = "./") -> None:
         self.path = path
