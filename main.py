@@ -16,18 +16,17 @@ banner = """
 
 if __name__ == "__main__":
     load_config()
-    
+
     walFile = None
     if WalConfig().is_wal_enabled():
         walFile = AOF_V2(WalConfig().get_path())
     store = KVStore()
     if walFile:
-        get_logger().debug("Checking for AOF file")
-        get_logger().debug("Replying the for AOF file")
+        get_logger().info("Checking for AOF file")
+        get_logger().info("Replying the for AOF file")
         walFile.replay(CommandHandler(store=store, walFile=None))
-        get_logger().debug("Replying the for AOF file done")
+        get_logger().info("Replying the for AOF file done")
     command_handler = CommandHandler(store=store, walFile=walFile)
     get_logger().debug(banner)
-    banner = None # clean-up allocated memeory for banner
-    Server(store=store,command_handler=command_handler).start_server()
-    
+    banner = None  # clean-up allocated memeory for banner
+    Server(store=store, command_handler=command_handler).start_server()
