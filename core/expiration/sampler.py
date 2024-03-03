@@ -39,8 +39,10 @@ def delete_expired_keys(storage):
     while True:
         deletion_to_sample_ratio = expire_sample(storage)
 
-        get_logger().info(
-            f"eviction ratio : {deletion_to_sample_ratio}",
-        )
+        if deletion_to_sample_ratio > 0.0:
+            get_logger().info(
+                f"eviction ratio : {deletion_to_sample_ratio}",
+            )
+
         if deletion_to_sample_ratio < 0.25:
             break
