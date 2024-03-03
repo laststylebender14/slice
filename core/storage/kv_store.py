@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from core.storage.options import Options
 from core.storage.node import Node
 from core.utils.time_utils import convert_second_to_absolute_expiray_in_ms, convert_time_to_ms
+from core.constants.operation_return_constants import StorageOperationReturnType
 
 class Store(ABC):
     @abstractmethod
@@ -26,10 +27,6 @@ class Store(ABC):
     @abstractmethod
     def store(self):
         pass
-
-KEY_VALUE_NOT_EXISTS = -1
-KEY_VALUE_NOT_INSERTED = 0
-KEY_VALUE_INSERTED = 1
 
 class KVStore(Store):
     _instance = None
@@ -55,7 +52,7 @@ class KVStore(Store):
         """ 
             depending on the options set, this function returns absolute expiry time.
         """
-        if value.ttl > 0:
+        if value.ttl is not None and value.ttl > 0:
             if options == Options.EX:
                 value.ttl = convert_time_to_ms() + value.ttl
             else:
@@ -63,25 +60,25 @@ class KVStore(Store):
         return value
         
         
-    def set_nx(self,key: str, value: Node | None, options:Options = None) -> int:
+    def set_nx(self,key: str, value: Node | None, options:Options = None) -> StorageOperationReturnType:
         """ set if key doesn't exists"""
         if self.exists(key):
-            return KEY_VALUE_NOT_EXISTS
+            return StorageOperationReturnType.KEY_VALUE_NOT_INSERTED
         
         normalizedValue = self.normalize_ttl(value, options)        
         print("[Store]:","[setnx]:",f"{key} inserted into db")
         self.store[key] = normalizedValue
-        return KEY_VALUE_INSERTED
+        return StorageOperationReturnType.KEY_VALUE_INSERTED
     
-    def set_xx(self, key: str, value: Node | None, options:Options = None) -> int:
+    def set_xx(self, key: str, value: Node | None, options:Options = None) -> StorageOperationReturnType:
         if not self.exists(key):
-            return KEY_VALUE_NOT_EXISTS
+            return StorageOperationReturnType.KEY_VALUE_NOT_INSERTED
         normalizedValue = self.normalize_ttl(value, options)        
         print("[Store]:","[set_xx]:",f"{key} inserted into db")
         self.store[key] = normalizedValue
-        return KEY_VALUE_INSERTED
+        return StorageOperationReturnType.KEY_VALUE_INSERTED
         
-    def set(self, key: str, value: Node, options:Options = None) -> int | None:        
+    def set(self, key: str, value: Node, options:Options = None) -> StorageOperationReturnType:        
         if options == Options.NX:
             return self.set_nx(key,value,options)
         if options == Options.XX:
@@ -89,13 +86,12 @@ class KVStore(Store):
         else:
             print("[Store]:","[set]:",f"{key} inserted into db")
             self.store[key] = self.normalize_ttl(value, options)
-            return KEY_VALUE_INSERTED
+            return StorageOperationReturnType.KEY_VALUE_INSERTED
 
-    def get(self, key) -> Node | int:
+    def get(self, key) -> Node | StorageOperationReturnType:
         if self.exists(key):
             return self.store[key]
-        return KEY_VALUE_NOT_EXISTS
-        
+        return StorageOperationReturnType.KEY_VALUE_NOT_EXISTS
             
     def delete(self, key) -> bool:
         if key in self.store:
