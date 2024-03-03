@@ -70,7 +70,7 @@ class StringCommandHandler:
             len(commands) ==  2 then  ["KEY","VALUE"]
             len(commands) ==  3 then  ["KEY","VALUE","NX/XX"]
             len(commands) ==  4 then  ["KEY","VALUE","EX/PX","EXP_TIME"]
-            len(commands) ==  5 then  ["KEY","VALUE","NX/PX","EX/PX","EXP_TIME"]
+            len(commands) ==  5 then  ["KEY","VALUE","NX/PX","EX/PX","EXP_TIME"]    TODO: provide support for 5th command.
         """
         log_line = ",".join(commands)
         logging_command = commands
@@ -102,6 +102,8 @@ class StringCommandHandler:
             key, value, exp_command, exp_time = commands
             try:
                 expiration = int(exp_time,base=10)
+                if expiration < 0:
+                    raise ValueError("expiration time can't be negative")
             except ValueError:
                 return encode_bulk_strings_reps("ERR value is not an integer or out of range")
             processed_command = exp_command.strip().lower()
@@ -121,7 +123,7 @@ class StringCommandHandler:
             #[key, value, ex, 200]
             resp = self.interactor.set(key=key,value=Node(value=value,type=StructureType.STRING, ttl=expiration), options= options)
             if resp == 1:
-                logging_command[3] = str(processed_expiry_time)
+                logging_command[4] = str(processed_expiry_time)
                 log_line = ",".join(logging_command)
                 self.log(log_line)
                 return encode_simple_strings_resp("OK")
