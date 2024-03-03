@@ -157,7 +157,9 @@ class AOF_V2(WAL):
                     break
                 commands = data_string.split(",")
                 try:
-                    if "ex" or "px" in commands:
+                    is_ex_present = "ex" in commands
+                    is_px_present = "px" in commands
+                    if is_px_present or is_ex_present:
                         is_expiry_processed = False
                         index = -1
                         if "ex" in commands:
