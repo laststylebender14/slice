@@ -16,7 +16,7 @@ class CommandHandler:
             if command == SupportedCommands.PING.value:
                 return encode_simple_strings_resp("pong")
             elif command == SupportedCommands.ECHO.value:
-                return encode_simple_strings_resp(" ".join(commands))        
+                return encode_simple_strings_resp(" ".join(commands[1:]))        
             elif command == SupportedCommands.GET.value:
                 return self.string_command_handler.get(commands=commands)
             elif command == SupportedCommands.SET.value:
