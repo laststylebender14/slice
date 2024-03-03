@@ -42,6 +42,7 @@ To run SliceDB locally, you'll need:
 $ git clone https://github.com/ranjitmahadik/slice-db
 $ cd slice-db
 $ python3 main.py
+$ mv .example.env .env
 ```
 
 ## Slice in action
