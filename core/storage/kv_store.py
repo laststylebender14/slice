@@ -55,11 +55,11 @@ class KVStore(Store):
         """ 
             depending on the options set, this function returns absolute expiry time.
         """
-        if value.ttl:
+        if value.ttl > 0:
             if options == Options.EX:
-                value.ttl = convert_time_to_ms() + int(value.ttl,10) #TODO: handle the possibility of user passing non int values.
+                value.ttl = convert_time_to_ms() + value.ttl
             else:
-                value.ttl = convert_second_to_absolute_expiray_in_ms(int(value.ttl,10))
+                value.ttl = convert_second_to_absolute_expiray_in_ms(value.ttl)
         return value
         
         
