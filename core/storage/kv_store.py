@@ -23,6 +23,9 @@ class Store(ABC):
     @abstractmethod
     def exists(self,key:str) -> bool:
         pass
+    @abstractmethod
+    def store(self):
+        pass
 
 KEY_VALUE_NOT_EXISTS = -1
 KEY_VALUE_NOT_INSERTED = 0
@@ -100,6 +103,9 @@ class KVStore(Store):
             print("[Store]:",f"{key} deleted from db")
             return True
         return False
+    
+    def store(self) -> dict[str, Node]:
+        return self.store
     
     def __str__(self) -> str:
         return str(self.store)
