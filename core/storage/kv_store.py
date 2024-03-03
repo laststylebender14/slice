@@ -1,9 +1,8 @@
-import time
 from abc import ABC, abstractmethod
 
 from core.storage.options import Options
 from core.storage.node import Node
-from core.utils.time_utils import convert_to_absolute_expiray_in_ms, convert_time_to_ms
+from core.utils.time_utils import convert_second_to_absolute_expiray_in_ms, convert_time_to_ms
 
 class Store(ABC):
     @abstractmethod
@@ -60,7 +59,7 @@ class KVStore(Store):
             if options == Options.EX:
                 value.ttl = convert_time_to_ms() + int(value.ttl,10) #TODO: handle the possibility of user passing non int values.
             else:
-                value.ttl = convert_to_absolute_expiray_in_ms(int(value.ttl,10))
+                value.ttl = convert_second_to_absolute_expiray_in_ms(int(value.ttl,10))
         return value
         
         
