@@ -115,3 +115,42 @@ class AOF:
         """Clears the contents of the AOF file."""
         self.log_file.truncate(0)
         self.log_file.seek(0)
+
+
+class AOF_V2(WAL):
+    def __init__(self, log_file_path: str, separator: str = ","):
+        self.log_file = open(log_file_path, "a")  # Open file for append
+        self.separator = separator
+        
+    def log(self, aof_entry: str) -> None:
+        if self.log_file:
+            log_line = f"{calculate_crc(aof_entry)},{aof_entry}\n"
+            print("[LogLine]:", log_line)
+            self.log_file.write(log_line)
+            return True
+        return False
+    
+    def replay(self, command_handler = None) -> None:
+        """
+        Replays the logged operations from the AOF file into the provided data store,
+        verifying CRC for data integrity.
+
+        Args:
+            data_store: The data store object to interact with.
+
+        Raises:
+            CRCError: If the CRC checksum of a line doesn't match the calculated value.
+        """
+        with open(self.log_file.name, "r") as log_file:
+            for line in log_file:
+                elements = line.strip().split(self.separator)
+                crc_value_str = elements[0]
+                crc_value = int(crc_value_str)
+
+                data_string = self.separator.join(elements[1:])
+                calculated_crc = calculate_crc(data_string)
+                if calculated_crc != crc_value:
+                    print(f"CRC mismatch at line: {line}")
+                    break
+                commands = data_string.split(",")
+                command_handler.handle(commands)
