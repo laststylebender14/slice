@@ -11,7 +11,7 @@ Attributes:
           If None, the node doesn't expire.
 """
 class Node:
-    def __init__(self, value: any, type: StructureType, ttl: int = None) -> None:
+    def __init__(self, value: any, type: StructureType, ttl: int|None = None) -> None:
         self.value = value
         self.type = type
         self.ttl = ttl
