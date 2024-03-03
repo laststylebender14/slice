@@ -45,19 +45,24 @@ class IO_Multiplexer:
 
     def run(self):
         last_cron_exec_time = time()
-
-        while True:
-            if time() - last_cron_exec_time >= self.cron_frequency:
-                self.server.cron_execution()
-                last_cron_exec_time = time()
-                pass
-            events = self.selector.select(-1)
-            for key, mask in events:
-                callback = key.data
-                callback(key.fileobj, mask)
-
-    def __del__(self):
-        """
-        clean up for the selectors
-        """
-        self.selector.unregister(self.server_socket)
+        try:
+            while True:
+                if time() - last_cron_exec_time >= self.cron_frequency:
+                    self.server.cron_execution()
+                    last_cron_exec_time = time()
+                    pass
+                events = self.selector.select(-1)
+                for key, mask in events:
+                    callback = key.data
+                    callback(key.fileobj, mask)
+        except OSError as e:
+            get_logger().error(f"OSError {e}")
+        except KeyboardInterrupt:
+            get_logger().error(f"Keyboard interrupt detected.")
+        except Exception as e:
+            get_logger().error(f"Exception occurred. {e}")
+        finally:
+            get_logger().warn(f"closing server socket.")
+            self.server_socket.close()
+            self.selector.unregister(self.server_socket)
+            
