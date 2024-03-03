@@ -8,7 +8,7 @@ from core.storage.node import Node
 from core.types.structure_types import StructureType
 from core.storage.options import Options
 from core.aof.aof import WAL
-from core.commandhandler.supported_commands import SupportedCommands
+from core.utils.time_utils import convert_second_to_absolute_expiray_in_ms,convert_time_to_ms
 
 class StringOptions(Enum):
     NX = "nx"
@@ -73,7 +73,9 @@ class StringCommandHandler:
             len(commands) ==  5 then  ["KEY","VALUE","NX/PX","EX/PX","EXP_TIME"]
         """
         log_line = ",".join(commands)
+        logging_command = commands
         commands = commands[1:]
+        
         commandSize = len(commands)
         if commandSize not in [2,3,4,5]:
             return encode_bulk_strings_reps("ERR Syntax error")
@@ -98,17 +100,29 @@ class StringCommandHandler:
             
         elif commandSize == 4:
             key, value, exp_command, exp_time = commands
-            expiration = exp_time
+            try:
+                expiration = int(exp_time,base=10)
+            except ValueError:
+                return encode_bulk_strings_reps("ERR value is not an integer or out of range")
             processed_command = exp_command.strip().lower()
+            processed_expiry_time = 0
             if processed_command not in ["ex","px"]:
                 return encode_bulk_strings_reps("ERR Syntax error")
             if processed_command == StringOptions.PX.value:
+                processed_expiry_time = convert_second_to_absolute_expiray_in_ms(expiration)
                 options = Options("px")
             elif processed_command == StringOptions.EX.value:
+                processed_expiry_time = convert_time_to_ms() + expiration
                 options = Options("ex")
             
+            # process ttl in iterms of absolute expiry for logging else keys will be refilled whenever aof loaded.
+            # can't store ttl directly into aof file.
+            # so store ttl as expired_at into log file, and while reading do (time.time() * 1000) ms conversion - expired_at = to get the remaining ttl value.
+            #[key, value, ex, 200]
             resp = self.interactor.set(key=key,value=Node(value=value,type=StructureType.STRING, ttl=expiration), options= options)
             if resp == 1:
+                logging_command[3] = str(processed_expiry_time)
+                log_line = ",".join(logging_command)
                 self.log(log_line)
                 return encode_simple_strings_resp("OK")
             return encode_null_string_resp()
