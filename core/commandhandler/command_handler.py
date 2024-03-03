@@ -16,15 +16,15 @@ class CommandHandler:
             if command == SupportedCommands.PING.value:
                 return encode_simple_strings_resp("pong")
             elif command == SupportedCommands.ECHO.value:
-                return encode_simple_strings_resp(" ".join(commands[1:]))        
+                return encode_simple_strings_resp(" ".join(commands))        
             elif command == SupportedCommands.GET.value:
-                return self.string_command_handler.get(commands=commands[1:])
+                return self.string_command_handler.get(commands=commands)
             elif command == SupportedCommands.SET.value:
-                return self.string_command_handler.set(commands=commands[1:])
+                return self.string_command_handler.set(commands=commands)
             elif command == SupportedCommands.GETDEL.value:
-                return self.string_command_handler.delete(commands=commands[1:])
+                return self.string_command_handler.delete(commands=commands)
             elif command == SupportedCommands.SETNX.value:
-                return self.string_command_handler.setnx(commands=commands[1:])
+                return self.string_command_handler.setnx(commands=commands)
             elif command == SupportedCommands.SETXX.value:
-                return self.string_command_handler.setxx(commands=commands[1:])
+                return self.string_command_handler.setxx(commands=commands)
         return encode_bulk_strings_reps("Error syntax error")
