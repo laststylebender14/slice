@@ -8,3 +8,6 @@ def convert_second_to_absolute_expiray_in_ms(time_in_second: int) -> int:
         
 def convert_time_to_ms() -> int:
     return convert_second_to_ms(time())
+
+def convert_ms_to_seconds(time_in_ms: int) -> int:
+    return int(time_in_ms / 1000)
