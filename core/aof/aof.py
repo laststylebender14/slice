@@ -1,9 +1,11 @@
 from zlib import crc32
 from abc import abstractmethod
+from time import time
 
 from .aof_entry import AOFEntry
 from core.commandhandler.supported_commands import SupportedCommands
 from core.storage.options import Options
+from core.utils.time_utils import convert_ms_to_seconds
 
 def calculate_crc(data_string: str) -> int:
     """Calculates the CRC32 checksum for the provided data string."""
@@ -124,6 +126,7 @@ class AOF_V2(WAL):
         
     def log(self, aof_entry: str) -> None:
         if self.log_file:
+            aof_entry = aof_entry.lower()
             log_line = f"{calculate_crc(aof_entry)},{aof_entry}\n"
             print("[LogLine]:", log_line)
             self.log_file.write(log_line)
@@ -153,4 +156,26 @@ class AOF_V2(WAL):
                     print(f"CRC mismatch at line: {line}")
                     break
                 commands = data_string.split(",")
+                try:
+                    if "ex" or "px" in commands:
+                        is_expiry_processed = False
+                        index = -1
+                        if "ex" in commands:
+                            index = commands.index("ex")
+                            if index  + 1 < len(commands):
+                                commands[index + 1] = str(time() - int(commands[index + 1], 10))    # ttl in ms.
+                                is_expiry_processed = True
+                        else:
+                            index = commands.index("px")
+                            if index  + 1 < len(commands):
+                                new_ttl = int(time() - convert_ms_to_seconds(int(commands[index + 1])))
+                                commands[index + 1] = str(new_ttl)    # ttl in ms.
+                                is_expiry_processed = True
+                        if not is_expiry_processed:
+                            print("[AOF]:", "corrupt entry", data_string)
+                            continue;
+                except ValueError as err:
+                    print("[AOF]:", "corrupt entry", data_string, err)
+                    continue
+                
                 command_handler.handle(commands)
