@@ -10,7 +10,17 @@ def calculate_crc(data_string: str) -> int:
     """Calculates the CRC32 checksum for the provided data string."""
     return crc32(data_string.encode())
 
+"""
+AOF_V2 is implementation of WAL interface.
+AOF_V2 logs pairs into wal file in the following format.
 
+AOF_V2 -> only logs successful operations to reduce the size of log file.
+
+eg.
+    3101428243,set,new_key-9129,new_value
+    CRC,Operation,Key,Value,Options
+
+"""
 class AOF_V2(WAL):
     def __init__(self, log_file_path: str, separator: str = ","):
         self.log_file = open(log_file_path, "a")  # Open file for append
