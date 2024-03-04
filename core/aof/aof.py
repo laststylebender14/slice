@@ -3,8 +3,6 @@ from abc import abstractmethod
 from time import time
 
 from core.logger import logger
-from core.aof.aof_entry import AOFEntry
-from core.commandhandler.supported_commands import SupportedCommands
 from core.utils.time_utils import convert_ms_to_seconds
 
 
@@ -18,7 +16,7 @@ class WAL:
         pass
 
     @abstractmethod
-    def log(self, operation: SupportedCommands, entry: AOFEntry) -> None:
+    def log(self, wal_entry: str) -> None:
         pass
 
     @abstractmethod
