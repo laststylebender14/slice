@@ -22,7 +22,7 @@ class Server(IServer):
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server_socket.bind((host, port))
-        self.server_socket.listen(5)
+        self.server_socket.listen(20_000)
         self.server_socket.setblocking(False)
 
         self.store = store
