@@ -2,7 +2,7 @@ from typing import List
 
 from core.storage import IStore
 from core.commandhandler.string_command_handler import StringCommandHandler
-from core.resp import encode_simple_strings_resp, encode_bulk_strings_reps,encode_null_string_resp
+from core.resp import encode_simple_strings_resp
 from core.commandhandler.supported_commands import SupportedCommands
 
 
@@ -27,4 +27,4 @@ class CommandHandler:
                 return self.string_command_handler.setnx(commands=commands)
             elif command == SupportedCommands.SETXX.value:
                 return self.string_command_handler.setxx(commands=commands)
-        return encode_bulk_strings_reps("Error syntax error")
+        return encode_simple_strings_resp("Error syntax error")
