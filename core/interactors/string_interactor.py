@@ -67,4 +67,4 @@ class StringInteractor:
         resp: Node = self.store.get(key)
         if self.store.delete(key):
             return resp
-        raise OperationFailed(f"Failed to delete the key")
+        raise KeyNotExists(f"ERR didn't find the key you're looking for")
