@@ -1,3 +1,4 @@
+from core.logger.logger import logger
 from zlib import crc32
 from abc import abstractmethod
 from time import time
@@ -5,7 +6,6 @@ from time import time
 from .aof_entry import AOFEntry
 from core.commandhandler.supported_commands import SupportedCommands
 from core.utils.time_utils import convert_ms_to_seconds
-from core.logger.logger import get_logger
 
 
 def calculate_crc(data_string: str) -> int:
@@ -31,7 +31,7 @@ class AOF_V2(WAL):
         if self.log_file:
             aof_entry = aof_entry.lower()
             log_line = f"{calculate_crc(aof_entry)},{aof_entry}\n"
-            get_logger().debug(log_line)
+            logger.debug(log_line)
             self.log_file.write(log_line)
             return True
         return False
@@ -56,7 +56,7 @@ class AOF_V2(WAL):
                 data_string = self.separator.join(elements[1:])
                 calculated_crc = calculate_crc(data_string)
                 if calculated_crc != crc_value:
-                    get_logger().warn("CRC mismatch at line: {line}")
+                    logger.warn("CRC mismatch at line: {line}")
                     break
                 commands = data_string.split(",")
                 try:
@@ -82,10 +82,10 @@ class AOF_V2(WAL):
                                 commands[index + 1] = str(new_ttl)  # ttl in ms.
                                 is_expiry_processed = True
                         if not is_expiry_processed:
-                            get_logger().warn("corrupt entry = {data_string}")
+                            logger.warn("corrupt entry = {data_string}")
                             continue
                 except ValueError as err:
-                    get_logger().warn("corrupt entry = {data_string}")
+                    logger.error("corrupt entry = {data_string}")
                     continue
 
                 command_handler.handle(commands)

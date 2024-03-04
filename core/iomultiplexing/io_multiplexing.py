@@ -1,9 +1,9 @@
+from core.logger.logger import logger
 import selectors
 import socket
 from time import time
 
 from core.server.iserver import IServer
-from core.logger.logger import get_logger
 
 
 class IO_Multiplexer:
@@ -20,12 +20,12 @@ class IO_Multiplexer:
         self.selector.register(server_socket, selectors.EVENT_READ, self.accept)
 
         self.cron_frequency = 1
-        get_logger().info(f"i/o multiplexer registered with server socket")
+        logger.info(f"i/o multiplexer registered with server socket")
 
     def accept(self, client_socket: socket.socket, mask):
         conn, addr = client_socket.accept()
         self.concurrent_connection_count += 1
-        get_logger().info(
+        logger.info(
             f"Accepted connection from {addr}, total connection count : {self.concurrent_connection_count}"
         )
         conn.setblocking(False)
@@ -35,7 +35,7 @@ class IO_Multiplexer:
         data = client_socket.recv(1024).decode().strip()
         if not data:
             self.concurrent_connection_count -= 1
-            get_logger().info(
+            logger.info(
                 f"connection terminated from {client_socket}, total connection count : {self.concurrent_connection_count}"
             )
             self.selector.unregister(client_socket)
@@ -56,13 +56,13 @@ class IO_Multiplexer:
                     callback = key.data
                     callback(key.fileobj, mask)
         except OSError as e:
-            get_logger().error(f"OSError {e}")
+            logger.error(f"OSError {e}")
         except KeyboardInterrupt:
-            get_logger().error(f"Keyboard interrupt detected.")
+            logger.error(f"Keyboard interrupt detected.")
         except Exception as e:
-            get_logger().error(f"Exception occurred. {e}")
+            logger.error(f"Exception occurred. {e}")
         finally:
-            get_logger().warn(f"closing server socket.")
+            logger.warn(f"closing server socket.")
             self.server_socket.close()
             self.selector.unregister(self.server_socket)
             

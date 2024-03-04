@@ -1,9 +1,9 @@
+from core.logger.logger import logger
 from core.server.server import Server
 from core.storage.kv_store import KVStore
 from core.aof.aof import AOF_V2
 from core.commandhandler.command_handler import CommandHandler
 from config import load_config, WalConfig, ServerConfig
-from core.logger.logger import get_logger
 
 
 banner = """ 
@@ -22,10 +22,10 @@ if __name__ == "__main__":
         walFile = AOF_V2(WalConfig().get_path())
     store = KVStore()
     if walFile:
-        get_logger().info("Checking for AOF file")
-        get_logger().info("Replying the for AOF file")
+        logger.info("Checking for AOF file")
+        logger.info("Replying the for AOF file")
         walFile.replay(CommandHandler(store=store, walFile=None))
-        get_logger().info("Replying the for AOF file done")
+        logger.info("Replying the for AOF file done")
     command_handler = CommandHandler(store=store, walFile=walFile)
     print(banner)
     banner = None  # clean-up allocated memeory for banner

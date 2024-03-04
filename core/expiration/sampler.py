@@ -1,7 +1,7 @@
+from core.logger.logger import logger
 from random import sample
 
 from core.storage.node import Node
-from core.logger.logger import get_logger
 
 
 def expire_sample(dictionary: dict[str, Node]) -> float:
@@ -40,7 +40,7 @@ def delete_expired_keys(storage):
         deletion_to_sample_ratio = expire_sample(storage)
 
         if deletion_to_sample_ratio > 0.0:
-            get_logger().info(
+            logger.info(
                 f"eviction ratio : {deletion_to_sample_ratio}",
             )
 

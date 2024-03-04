@@ -1,11 +1,10 @@
-from core.logger.logger import get_logger
-
+from core.logger.logger import logger
 
 class ServerConfig:
     _instance = None
     _host = "localhost"
     _port = 6379
-
+    
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
             cls._instance = super().__new__(cls)
@@ -18,7 +17,7 @@ class ServerConfig:
         try:
             self._port = int(port, base=10)
         except ValueError as err:
-            get_logger().error(
+            logger.error(
                 f"PORT env can't be parsed, reverting to default port : {self._port} "
             )
 

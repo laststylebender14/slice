@@ -1,4 +1,5 @@
 import socket
+from core.logger.logger import logger
 import selectors
 
 from core.server.iserver import IServer
@@ -8,7 +9,6 @@ from core.resp.decoder import decode_redis_command
 from core.commandhandler.command_handler import CommandHandler
 from core.resp.encoder import encode_bulk_strings_reps
 from core.expiration.sampler import delete_expired_keys
-from core.logger.logger import get_logger
 
 class Server(IServer):
     def __init__(
@@ -34,7 +34,7 @@ class Server(IServer):
             server_socket=self.server_socket,
             server=self,
         )
-        get_logger().info(f"Dice DB started at {host}:{port}")
+        logger.info(f"Dice DB started at {host}:{port}")
         
 
     def start_server(self):
