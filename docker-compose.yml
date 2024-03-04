@@ -3,7 +3,7 @@ version: '3.9'
 services:
   slice-db:  
     build: . 
-    image: slice-db:v6
+    image: slice-db:v1
     container_name: slice-db
     ports:
       - "6379:6379"
