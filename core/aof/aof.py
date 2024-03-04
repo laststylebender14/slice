@@ -1,7 +1,7 @@
 from zlib import crc32
-from abc import abstractmethod
 from time import time
 
+from core.aof.wal import WAL
 from core.logger import logger
 from core.utils.time_utils import convert_ms_to_seconds
 
@@ -10,18 +10,6 @@ def calculate_crc(data_string: str) -> int:
     """Calculates the CRC32 checksum for the provided data string."""
     return crc32(data_string.encode())
 
-
-class WAL:
-    def __init__(self) -> None:
-        pass
-
-    @abstractmethod
-    def log(self, wal_entry: str) -> None:
-        pass
-
-    @abstractmethod
-    def replay(self, command_handler = None):
-        pass
 
 class AOF_V2(WAL):
     def __init__(self, log_file_path: str, separator: str = ","):
