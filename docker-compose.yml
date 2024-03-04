@@ -5,6 +5,10 @@ services:
     build: . 
     image: slice-db:v1
     container_name: slice-db
+    environment:
+      - HOST=0.0.0.0
+      - PORT=6379
+      - ENABLE_PERSISTENCE=False
     ports:
       - "6379:6379"
     networks:
