@@ -18,8 +18,8 @@ if __name__ == "__main__":
     load_config()
 
     walFile = None
-    if WalConfig().is_wal_enabled():
-        walFile = AOF_V2(WalConfig().get_path())
+    if WalConfig().wal_enable:
+        walFile = AOF_V2(WalConfig().path)
     store = KVStore()
     if walFile:
         logger.info("Checking for AOF file")
@@ -30,8 +30,8 @@ if __name__ == "__main__":
     print(banner)
     banner = None  # clean-up allocated memeory for banner
     Server(
-        host=ServerConfig().get_host(),
-        port=ServerConfig().get_port(),
+        host=ServerConfig().host,
+        port=ServerConfig().port,
         store=store,
         command_handler=command_handler,
     ).start_server()

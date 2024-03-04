@@ -9,11 +9,21 @@ class ServerConfig:
         if not cls._instance:
             cls._instance = super().__new__(cls)
         return cls._instance
+    
+    @property
+    def host(self) -> str:
+        return self._host
+    
+    @property
+    def port(self) -> int:
+        return self._port
 
-    def set_host(self, host: str = "localhost") -> None:
+    @host.setter
+    def host(self, host: str = "localhost") -> None:
         self._host = host
 
-    def set_port(self, port: int = 6379) -> None:
+    @port.setter
+    def port(self, port: int = 6379) -> None:
         try:
             self._port = int(port, base=10)
         except ValueError as err:
@@ -21,11 +31,5 @@ class ServerConfig:
                 f"PORT env can't be parsed, reverting to default port : {self._port} "
             )
 
-    def get_host(self) -> str:
-        return self._host
-
-    def get_port(self) -> int:
-        return self._port
-
     def __str__(self) -> str:
-        return f"host : {self._host}, port: {self._port}"
+        return f"host:{self._host} port:{self._port}"
