@@ -2,9 +2,9 @@ from core.logger import logger
 
 class WalConfig:
     _instance = None
-    _wal_enable = False
-    _path = "./aof.slice"
-    _flush_frequency = 1000 # after 1000 keys change, it will flush buffer aof data to disk.
+    _wal_enable: bool = False
+    _path: str = "./aof.slice"
+    _flush_frequency: int = 1000 # after 1000 keys change, it will flush buffer aof data to disk.
     
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
@@ -12,21 +12,21 @@ class WalConfig:
         return cls._instance
     
     @property
-    def wal_enable(self):
+    def wal_enable(self) -> bool:
         return self._wal_enable
     
     @property
-    def path(self):
+    def path(self) -> str:
         return self._path
     
     @property
-    def flush_frequency(self):
+    def flush_frequency(self) -> int:
         return self._flush_frequency
     
     @flush_frequency.setter
-    def flush_frequency(self, flush_frequency: int = 1000):
+    def flush_frequency(self, flush_frequency: int):
         try:
-            self.flush_frequency = int(flush_frequency, base = 10)
+            self._flush_frequency = int(flush_frequency)
         except ValueError:
             logger.warn(f"failed to prase flush frequency, reverting to default : {self._flush_frequency}")
     
