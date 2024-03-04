@@ -1,21 +1,22 @@
 import socket
-from core.logger.logger import logger
 import selectors
 
+from core.logger import logger
 from core.server.iserver import IServer
-from core.storage.kv_store import Store, KVStore
-from core.iomultiplexing.io_multiplexing import IO_Multiplexer
-from core.resp.decoder import decode_redis_command
-from core.commandhandler.command_handler import CommandHandler
-from core.resp.encoder import encode_bulk_strings_reps
-from core.expiration.sampler import delete_expired_keys
+from core.storage import KVStore, IStore
+from core.iomultiplexing import IO_Multiplexer
+from core.resp import decode_redis_command
+from core.commandhandler import CommandHandler
+from core.resp import encode_bulk_strings_reps
+from core.expiration import delete_expired_keys
+
 
 class Server(IServer):
     def __init__(
         self,
         host: str = "localhost",
         port: int = 6379,
-        store: Store = KVStore(),
+        store: IStore = KVStore(),
         command_handler: CommandHandler = None,
     ) -> None:
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -35,7 +36,6 @@ class Server(IServer):
             server=self,
         )
         logger.info(f"Dice DB started at {host}:{port}")
-        
 
     def start_server(self):
         """

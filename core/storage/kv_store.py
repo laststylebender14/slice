@@ -1,6 +1,6 @@
-from abc import ABC, abstractmethod
-from core.logger.logger import logger
+from core.logger import logger
 
+from core.storage.istore import IStore
 from core.storage.options import Options
 from core.storage.node import Node
 from core.utils.time_utils import (
@@ -10,40 +10,10 @@ from core.utils.time_utils import (
 from core.constants.operation_return_constants import StorageOperationReturnType
 
 
-class Store(ABC):
-    @abstractmethod
-    def set_nx(self, key: str, value: Node, options: Options) -> int:
-        pass
-
-    @abstractmethod
-    def set_xx(self, key: str, value: Node, options: Options) -> int:
-        pass
-
-    @abstractmethod
-    def set(self, key: str, value: Node, options: Options) -> int:
-        pass
-
-    @abstractmethod
-    def get(self, key: str, value: Node) -> Node:
-        pass
-
-    @abstractmethod
-    def delete(self, key: str) -> bool:
-        pass
-
-    @abstractmethod
-    def exists(self, key: str) -> bool:
-        pass
-
-    @abstractmethod
-    def store(self):
-        pass
-
-
-class KVStore(Store):
+class KVStore(IStore):
     _instance = None
 
-    def __new__(cls, *args, **kwargs) -> Store:
+    def __new__(cls, *args, **kwargs) -> IStore:
         if not cls._instance:
             cls._instance = super().__new__(cls)
         return cls._instance

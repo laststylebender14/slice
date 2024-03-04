@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 import os
 
-from core.logger.logger import set_logging_level
+from core.logger import set_logging_level
 from config.wal_config import WalConfig
 from config.server_config import ServerConfig
 

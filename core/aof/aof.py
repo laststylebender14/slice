@@ -1,9 +1,9 @@
-from core.logger.logger import logger
 from zlib import crc32
 from abc import abstractmethod
 from time import time
 
-from .aof_entry import AOFEntry
+from core.logger import logger
+from core.aof.aof_entry import AOFEntry
 from core.commandhandler.supported_commands import SupportedCommands
 from core.utils.time_utils import convert_ms_to_seconds
 
@@ -21,6 +21,9 @@ class WAL:
     def log(self, operation: SupportedCommands, entry: AOFEntry) -> None:
         pass
 
+    @abstractmethod
+    def replay(self, command_handler = None):
+        pass
 
 class AOF_V2(WAL):
     def __init__(self, log_file_path: str, separator: str = ","):

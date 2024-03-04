@@ -1,23 +1,20 @@
 from typing import List
 from enum import Enum
 
-from core.storage.kv_store import Store
-from core.interactors.string_interactor import StringInteractor
-from core.resp.encoder import (
+from core.storage import IStore, Node, Options
+from core.interactors import StringInteractor
+from core.resp import (
     encode_simple_strings_resp,
     encode_bulk_strings_reps,
     encode_null_string_resp,
     encode_integer,
 )
-from core.storage.node import Node
-from core.types.structure_types import StructureType
-from core.storage.options import Options
+from core.types import StructureType
 from core.aof.aof import WAL
 from core.utils.time_utils import (
     convert_second_to_absolute_expiray_in_ms,
     convert_time_to_ms,
 )
-from core.constants.operation_return_constants import StorageOperationReturnType
 from exceptions import (
     InvalidValueType,
     IncompatibleValueType,
@@ -34,7 +31,7 @@ class StringOptions(Enum):
 
 
 class StringCommandHandler:
-    def __init__(self, store: Store, walFile: WAL = None) -> None:
+    def __init__(self, store: IStore, walFile: WAL = None) -> None:
         self.interactor = StringInteractor(store=store)
         self.walFile = walFile
 

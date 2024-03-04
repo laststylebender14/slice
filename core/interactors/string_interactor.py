@@ -1,6 +1,4 @@
-from core.storage.kv_store import Store
-from core.storage.node import Node
-
+from core.storage import IStore, Node, Options
 from core.types import StructureType
 from exceptions import (
     InvalidValueType,
@@ -8,12 +6,11 @@ from exceptions import (
     KeyNotExists,
     OperationFailed,
 )
-from core.storage.options import Options
 from core.constants.operation_return_constants import StorageOperationReturnType
 
 
 class StringInteractor:
-    def __init__(self, store: Store) -> None:
+    def __init__(self, store: IStore) -> None:
         self.store = store
 
     def setnx(
@@ -48,7 +45,7 @@ class StringInteractor:
         if resp != StorageOperationReturnType.KEY_VALUE_INSERTED:
             raise OperationFailed("ERR record not inserted.")
         return resp
-        
+
     def get(self, key: str) -> Node:
         resp: Node | None | StorageOperationReturnType = self.store.get(key)
         if isinstance(resp, Node) and resp.type != StructureType.STRING:

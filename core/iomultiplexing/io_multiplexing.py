@@ -1,8 +1,8 @@
-from core.logger.logger import logger
 import selectors
 import socket
 from time import time
 
+from core.logger import logger
 from core.server.iserver import IServer
 
 

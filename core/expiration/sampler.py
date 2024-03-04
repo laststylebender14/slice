@@ -1,7 +1,7 @@
-from core.logger.logger import logger
+from core.logger import logger
 from random import sample
 
-from core.storage.node import Node
+from core.storage import Node
 
 
 def expire_sample(dictionary: dict[str, Node]) -> float:
@@ -36,6 +36,15 @@ def expire_sample(dictionary: dict[str, Node]) -> float:
 
 
 def delete_expired_keys(storage):
+    """ 
+        this is blocking call on main thread, think about if we can
+        use threads here, as now it's out of scope as it would required us
+        handle locking over the hashtable but can be done in future.
+                        or 
+        temporary add counter after which this loop break to give the chance
+        to incoming connections.
+    """
+    
     while True:
         deletion_to_sample_ratio = expire_sample(storage)
 

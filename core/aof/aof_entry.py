@@ -1,4 +1,4 @@
-from core.storage.options import Options
+from core.storage import Options
 
 class AOFEntry:
     def __init__(self, key: str, value=None, ttl=None, options: Options = None ):

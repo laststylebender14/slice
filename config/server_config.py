@@ -1,4 +1,4 @@
-from core.logger.logger import logger
+from core.logger import logger
 
 class ServerConfig:
     _instance = None

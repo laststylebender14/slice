@@ -1,8 +1,8 @@
-from core.logger.logger import logger
-from core.server.server import Server
-from core.storage.kv_store import KVStore
+from core.logger import logger
+from core.server import Server
+from core.storage import KVStore
 from core.aof.aof import AOF_V2
-from core.commandhandler.command_handler import CommandHandler
+from core.commandhandler import CommandHandler
 from config import load_config, WalConfig, ServerConfig
 
 

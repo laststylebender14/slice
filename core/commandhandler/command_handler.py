@@ -1,13 +1,13 @@
 from typing import List
 
-from core.storage.kv_store import Store
+from core.storage import IStore
 from core.commandhandler.string_command_handler import StringCommandHandler
-from core.resp.encoder import encode_simple_strings_resp, encode_bulk_strings_reps,encode_null_string_resp
+from core.resp import encode_simple_strings_resp, encode_bulk_strings_reps,encode_null_string_resp
 from core.commandhandler.supported_commands import SupportedCommands
 
 
 class CommandHandler:
-    def __init__(self, store: Store, walFile) -> None:
+    def __init__(self, store: IStore, walFile) -> None:
         self.string_command_handler = StringCommandHandler(store=store, walFile=walFile)
             
     def handle(self, commands: List[str]) -> str:
