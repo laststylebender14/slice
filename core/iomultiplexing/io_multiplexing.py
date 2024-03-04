@@ -62,7 +62,7 @@ class IO_Multiplexer:
         except Exception as e:
             logger.error(f"Exception occurred. {e}")
         finally:
-            logger.warn(f"closing server socket.")
+            logger.error(f"closing server socket.")
             self.server_socket.close()
             self.selector.unregister(self.server_socket)
             
