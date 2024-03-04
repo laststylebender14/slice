@@ -4,7 +4,7 @@ from time import time
 from core.aof.wal import WAL
 from core.logger import logger
 from core.utils.time_utils import convert_ms_to_seconds
-
+from config import WalConfig
 
 def calculate_crc(data_string: str) -> int:
     """Calculates the CRC32 checksum for the provided data string."""
@@ -25,12 +25,20 @@ class AOF_V2(WAL):
     def __init__(self, log_file_path: str, separator: str = ","):
         self.log_file = open(log_file_path, "a")  # Open file for append
         self.separator = separator
+        if self.log_file:
+            self.key_buffer_cnt = 0
 
     def log(self, aof_entry: str) -> None:
         if self.log_file:
             aof_entry = aof_entry.lower()
             log_line = f"{calculate_crc(aof_entry)},{aof_entry}\n"
             logger.debug(log_line)
+            if self.key_buffer_cnt == WalConfig().flush_frequency:
+                # if we met flush frequency criteria, then flush the buffered pairs to disk.
+                self.log_file.flush()
+                logger.info("flushed buffered pairs onto the disk")
+                self.key_buffer_cnt = 0
+            self.key_buffer_cnt += 1
             self.log_file.write(log_line)
             return True
         return False
@@ -40,11 +48,10 @@ class AOF_V2(WAL):
         Replays the logged operations from the AOF file into the provided data store,
         verifying CRC for data integrity.
 
+        TODO: CRC checks failed rows are ignored for now but make it configurable in future.
+        
         Args:
-            data_store: The data store object to interact with.
-
-        Raises:
-            CRCError: If the CRC checksum of a line doesn't match the calculated value.
+            restore_command_handler: that restores AOF_V2 logged rows to appropriate version.
         """
         with open(self.log_file.name, "r") as log_file:
             for line in log_file:
