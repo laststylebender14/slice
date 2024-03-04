@@ -2,7 +2,7 @@ from core.server.server import Server
 from core.storage.kv_store import KVStore
 from core.aof.aof import AOF_V2
 from core.commandhandler.command_handler import CommandHandler
-from config import load_config, WalConfig
+from config import load_config, WalConfig, ServerConfig
 from core.logger.logger import get_logger
 
 
@@ -29,4 +29,9 @@ if __name__ == "__main__":
     command_handler = CommandHandler(store=store, walFile=walFile)
     print(banner)
     banner = None  # clean-up allocated memeory for banner
-    Server(store=store, command_handler=command_handler).start_server()
+    Server(
+        host=ServerConfig().get_host(),
+        port=ServerConfig().get_port(),
+        store=store,
+        command_handler=command_handler,
+    ).start_server()
