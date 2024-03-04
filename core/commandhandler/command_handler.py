@@ -14,7 +14,7 @@ class CommandHandler:
         if isinstance(commands, List) and len(commands) > 0:
             command = commands[0].strip().lower()
             if command == SupportedCommands.PING.value:
-                return encode_simple_strings_resp("pong")
+                return encode_simple_strings_resp("PONG")
             elif command == SupportedCommands.ECHO.value:
                 return encode_simple_strings_resp(" ".join(commands[1:]))        
             elif command == SupportedCommands.GET.value:
