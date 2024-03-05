@@ -3,7 +3,7 @@ from time import time
 
 from core.aof.wal import WAL
 from core.logger import logger
-from core.utils.time_utils import convert_ms_to_seconds
+from core.utils.time_utils import convert_ms_to_seconds, convert_time_to_ms
 from config import WalConfig
 
 def calculate_crc(data_string: str) -> int:
@@ -49,7 +49,6 @@ class AOF_V2(WAL):
         verifying CRC for data integrity.
 
         TODO: CRC checks failed rows are ignored for now but make it configurable in future.
-        
         Args:
             restore_command_handler: that restores AOF_V2 logged rows to appropriate version.
         """
@@ -74,18 +73,24 @@ class AOF_V2(WAL):
                         if "ex" in commands:
                             index = commands.index("ex")
                             if index + 1 < len(commands):
-                                commands[index + 1] = str(
-                                    time() - int(commands[index + 1], 10)
-                                )  # ttl in ms.
+                                time_in_ms = convert_time_to_ms()
+                                expired_at_ms = int(commands[index + 1], 10)
+                                actual_ttl_ms = expired_at_ms - time_in_ms
+                                if actual_ttl_ms < 0:
+                                    # no point in parsing as this entry is already expired.
+                                    continue
+                                commands[index + 1] = str(actual_ttl_ms)  # ttl in ms.
                                 is_expiry_processed = True
                         else:
                             index = commands.index("px")
                             if index + 1 < len(commands):
-                                new_ttl = int(
-                                    time()
-                                    - convert_ms_to_seconds(int(commands[index + 1]))
-                                )
-                                commands[index + 1] = str(new_ttl)  # ttl in ms.
+                                time_in_sec = int(time())
+                                expired_at_in_sec = convert_ms_to_seconds(int(commands[index + 1]))
+                                actual_ttl_in_sec = expired_at_in_sec - time_in_sec
+                                if actual_ttl_in_sec < 0:                                
+                                    # no point in parsing as this entry is already expired.
+                                    continue
+                                commands[index + 1] = str(actual_ttl_in_sec)  # ttl in ms.
                                 is_expiry_processed = True
                         if not is_expiry_processed:
                             logger.warn("corrupt entry = {data_string}")
