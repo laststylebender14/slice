@@ -34,5 +34,5 @@ class IStore(ABC):
         pass
 
     @abstractmethod
-    def ttl(self, key: str) -> int | StorageOperationReturnType:
+    def ttl(self, key: str) -> int | StorageOperationReturnType | None:
         pass

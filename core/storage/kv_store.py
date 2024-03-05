@@ -93,9 +93,11 @@ class KVStore(IStore):
     def store(self) -> dict[str, Node]:
         return self.store
 
-    def ttl(self,key: str) -> int | StorageOperationReturnType:
+    def ttl(self,key: str) -> int | StorageOperationReturnType | None:
         if self.exists(key):
-            return de_normalize_ttl(self.get(key).ttl)
+            if self.get(key).ttl is not None:
+                return de_normalize_ttl(self.get(key).ttl)
+            return None
         return StorageOperationReturnType.KEY_VALUE_NOT_EXISTS
      
     def __str__(self) -> str:
