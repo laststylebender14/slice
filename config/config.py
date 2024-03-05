@@ -15,6 +15,7 @@ def load_config():
     if wal_instance.wal_enable:
         wal_instance.path = os.getenv("WAL_FILE_PATH", "./aof.slice")
         wal_instance.flush_frequency = os.getenv("FLUSH_FREQUENCY", "1000")
+        wal_instance.ttl_normalizer = os.getenv("TTL_NORMALIZER", "1709618598664")
     
     server_instance = ServerConfig()
     server_instance.host = os.getenv("HOST", "localhost")
