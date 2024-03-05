@@ -14,6 +14,7 @@ from core.aof.aof import WAL
 from core.utils.time_utils import (
     convert_second_to_absolute_expiray_in_ms,
     convert_time_to_ms,
+    normalize_ttl
 )
 from exceptions import (
     InvalidValueType,
@@ -150,12 +151,12 @@ class StringCommandHandler:
             if processed_command not in ["ex", "px"]:
                 return encode_bulk_strings_reps("ERR Syntax error")
             if processed_command == StringOptions.PX.value:
-                processed_expiry_time = convert_second_to_absolute_expiray_in_ms(
+                processed_expiry_time = normalize_ttl(convert_second_to_absolute_expiray_in_ms(
                     expiration
-                )
+                ))
                 options = Options("px")
             elif processed_command == StringOptions.EX.value:
-                processed_expiry_time = convert_time_to_ms() + expiration
+                processed_expiry_time = normalize_ttl(convert_time_to_ms() + expiration)
                 options = Options("ex")
 
             # process ttl in iterms of absolute expiry for logging else keys will be refilled whenever aof loaded.
