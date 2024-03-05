@@ -13,6 +13,8 @@ class CommandHandler:
     def handle(self, commands: List[str]) -> str:
         if isinstance(commands, List) and len(commands) > 0:
             command = commands[0].strip().lower()
+            if command == SupportedCommands.TTL.value:
+                return encode_simple_strings_resp("not implemented yet.")
             if command == SupportedCommands.PING.value:
                 return encode_simple_strings_resp("PONG")
             elif command == SupportedCommands.ECHO.value:
