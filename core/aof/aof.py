@@ -3,7 +3,7 @@ from time import time
 
 from core.aof.wal import WAL
 from core.logger import logger
-from core.utils.time_utils import convert_ms_to_seconds, convert_time_to_ms
+from core.utils.time_utils import convert_ms_to_seconds, convert_time_to_ms, de_normalize_ttl
 from config import WalConfig
 
 def calculate_crc(data_string: str) -> int:
@@ -74,7 +74,7 @@ class AOF_V2(WAL):
                             index = commands.index("ex")
                             if index + 1 < len(commands):
                                 time_in_ms = convert_time_to_ms()
-                                expired_at_ms = int(commands[index + 1], 10)
+                                expired_at_ms = de_normalize_ttl(int(commands[index + 1], 10))
                                 actual_ttl_ms = expired_at_ms - time_in_ms
                                 if actual_ttl_ms < 0:
                                     # no point in parsing as this entry is already expired.
@@ -85,7 +85,7 @@ class AOF_V2(WAL):
                             index = commands.index("px")
                             if index + 1 < len(commands):
                                 time_in_sec = int(time())
-                                expired_at_in_sec = convert_ms_to_seconds(int(commands[index + 1]))
+                                expired_at_in_sec = convert_ms_to_seconds(de_normalize_ttl(int(commands[index + 1])))
                                 actual_ttl_in_sec = expired_at_in_sec - time_in_sec
                                 if actual_ttl_in_sec < 0:                                
                                     # no point in parsing as this entry is already expired.
