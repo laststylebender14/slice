@@ -33,13 +33,13 @@ class AOF_V2(WAL):
             aof_entry = aof_entry.lower()
             log_line = f"{calculate_crc(aof_entry)},{aof_entry}\n"
             logger.debug(log_line)
-            if self.key_buffer_cnt == WalConfig().flush_frequency:
+            self.key_buffer_cnt += 1
+            self.log_file.write(log_line)
+            if self.key_buffer_cnt >= WalConfig().flush_frequency:
                 # if we met flush frequency criteria, then flush the buffered pairs to disk.
                 self.log_file.flush()
                 logger.info("flushed buffered pairs onto the disk")
                 self.key_buffer_cnt = 0
-            self.key_buffer_cnt += 1
-            self.log_file.write(log_line)
             return True
         return False
 
