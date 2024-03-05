@@ -28,11 +28,8 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: slice-db-deployment
-  labels:
-    app: slice-db
+  name: slice-db
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: slice-db
@@ -43,11 +40,11 @@ spec:
     spec:
       volumes:
         - name: data
-          persistentVolumeClaim: 
+          persistentVolumeClaim:
             claimName: slicevolumeclaim
       containers:
       - name: slice-db
-        image: slicedb/slice-db:v1
+        image: slicedb/slice-db:v1.1
         volumeMounts:
           - mountPath: "/app/backup"
             name: data
@@ -55,7 +52,7 @@ spec:
           - name: "HOST"
             value: "0.0.0.0"
           - name: "PORT"
-            value: "6379"
+            value: "6380"
           - name: ENABLE_PERSISTENCE
             value: "True"
           - name: WAL_FILE_PATH
@@ -64,19 +61,18 @@ spec:
             value: "1"
         resources:
           limits:
-            memory: "300Mi"
+            memory: "128Mi"
             cpu: "500m"
         ports:
-        - containerPort: 6379
+        - containerPort: 6380
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: slice-db-service
+  name: slice-db-svc
 spec:
   selector:
-    app.kubernetes.io/name: slice-db
+    app: slice-db
   ports:
-    - protocol: TCP
-      port: 6379
-      targetPort: 6379
+  - port: 6380
+    targetPort: 6380
