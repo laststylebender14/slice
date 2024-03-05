@@ -6,6 +6,8 @@ from core.storage.node import Node
 from core.utils.time_utils import (
     convert_second_to_absolute_expiray_in_ms,
     convert_time_to_ms,
+    normalize_ttl,
+    de_normalize_ttl
 )
 from core.constants.operation_return_constants import StorageOperationReturnType
 
@@ -37,9 +39,9 @@ class KVStore(IStore):
         """
         if value.ttl is not None and value.ttl > 0:
             if options == Options.EX:
-                value.ttl = convert_time_to_ms() + value.ttl
+                value.ttl = normalize_ttl(convert_time_to_ms() + value.ttl)
             else:
-                value.ttl = convert_second_to_absolute_expiray_in_ms(value.ttl)
+                value.ttl = normalize_ttl(convert_second_to_absolute_expiray_in_ms(value.ttl))
         return value
 
     def set_nx(
@@ -93,7 +95,7 @@ class KVStore(IStore):
 
     def ttl(self,key: str) -> int | StorageOperationReturnType:
         if self.exists(key):
-            return self.get(key).ttl
+            return de_normalize_ttl(self.get(key).ttl)
         return StorageOperationReturnType.KEY_VALUE_NOT_EXISTS
      
     def __str__(self) -> str:

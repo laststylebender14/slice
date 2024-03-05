@@ -1,5 +1,6 @@
 import time
 from core.types import StructureType
+from core.utils.time_utils import de_normalize_ttl
 
 """
 Class representing a node in the slice database.
@@ -19,7 +20,7 @@ class Node:
     def is_node_expired(self) -> bool:
         """Checks if the node has expired based on its TTL."""
         current_time_ms = int(time.time() * 1000)
-        return self.ttl is not None and current_time_ms >= self.ttl
+        return self.ttl is not None and current_time_ms > de_normalize_ttl(self.ttl)
 
     def __str__(self):
         """Returns a string representation of the node's attributes."""
