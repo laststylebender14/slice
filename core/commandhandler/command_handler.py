@@ -2,6 +2,7 @@ from typing import List
 
 from core.storage import IStore
 from core.commandhandler.string_command_handler import StringCommandHandler
+from core.commandhandler.generic_command_handler import GenericCommandHandler
 from core.resp import encode_simple_strings_resp
 from core.commandhandler.supported_commands import SupportedCommands
 
@@ -9,12 +10,13 @@ from core.commandhandler.supported_commands import SupportedCommands
 class CommandHandler:
     def __init__(self, store: IStore, walFile) -> None:
         self.string_command_handler = StringCommandHandler(store=store, walFile=walFile)
+        self.generic_command_handler = GenericCommandHandler(store=store)
             
     def handle(self, commands: List[str]) -> str:
         if isinstance(commands, List) and len(commands) > 0:
             command = commands[0].strip().lower()
             if command == SupportedCommands.TTL.value:
-                return encode_simple_strings_resp("not implemented yet.")
+                return self.generic_command_handler.ttl(commands=commands)
             if command == SupportedCommands.PING.value:
                 return encode_simple_strings_resp("PONG")
             elif command == SupportedCommands.ECHO.value:

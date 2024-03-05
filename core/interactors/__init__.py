@@ -1,1 +1,2 @@
 from core.interactors.string_interactor import StringInteractor
+from core.interactors.generic_interactor import GenericInteractor
