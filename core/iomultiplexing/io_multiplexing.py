@@ -50,7 +50,6 @@ class IO_Multiplexer:
                 if time() - last_cron_exec_time >= self.cron_frequency:
                     self.server.cron_execution()
                     last_cron_exec_time = time()
-                    pass
                 events = self.selector.select(timeout=1)
                 for key, mask in events:
                     callback = key.data
