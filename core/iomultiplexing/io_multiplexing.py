@@ -51,7 +51,7 @@ class IO_Multiplexer:
                     self.server.cron_execution()
                     last_cron_exec_time = time()
                     pass
-                events = self.selector.select(-1)
+                events = self.selector.select(timeout=1)
                 for key, mask in events:
                     callback = key.data
                     callback(key.fileobj, mask)
