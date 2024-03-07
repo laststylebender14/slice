@@ -44,7 +44,7 @@ spec:
             claimName: slicevolumeclaim
       containers:
       - name: slice-db
-        image: slicedb/slice-db:v1.1
+        image: slicedb/slice-db:v1.2
         volumeMounts:
           - mountPath: "/app/backup"
             name: data
