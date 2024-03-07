@@ -3,7 +3,7 @@ version: '3.9'
 services:
   slice-db:  
     build: . 
-    image: slicedb/slice-db:v1.1
+    image: slicedb/slice-db:v1.2
     container_name: slice-db
     environment:
       - HOST=0.0.0.0
